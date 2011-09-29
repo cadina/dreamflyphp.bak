@@ -3,21 +3,20 @@
 define('DS', DIRECTORY_SEPARATOR);
 define('DSPRT', DIRECTORY_SEPARATOR . '..');
 
+define('APPLICATION_NAMESPACE','application');
 define('APPLICATION_DIRECTORY', __DIR__ . DS . 'application');
-define('CACHE_DIRECTORY', __DIR__ . DS . 'cache');
-define('RESOURCE_DIRECTORY', __DIR__ . DS . 'resource');
 
 require __DIR__. DSPRT . DSPRT . DS . 'framework' . DS . 'bootstrap.php';
 
 
+map(APPLICATION_NAMESPACE, APPLICATION_DIRECTORY);
 
 need('system.*');
 need('system.web.*');
 need('application.*');
-need('application.models.*');
 
 
-$application = new CWebApplication(APPLICATION_DIRECTORY);
+$application = new CWebApplication(APPLICATION_NAMESPACE);
 
 $application->run();
 

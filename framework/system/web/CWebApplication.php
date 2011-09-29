@@ -3,18 +3,15 @@
 class CWebApplication extends CApplication
 {
 
+	public $controllersDir = 'controller';
+
     protected $_siteUrl;
 
 
-    final public function __construct()
-    {
-        parent::__construct();
-        $this->_initializeModules();
-    }
-
 	final public function run()
 	{
-        $this->configure(CConfig::load('application'));
+		$this->_initializeModules();
+        $this->configure($this->loadConfig('application'));
 		$this->initialize();
 		$context = $this->poccessRequest();
 		$this->executeController($context);
@@ -34,7 +31,7 @@ class CWebApplication extends CApplication
 	protected function executeController($context)
 	{
         $controllerName = $context->controllerName;
-        need(APPLICATION_NAMESPACE_CONTROLLERS.NS.$controllerName);
+        need($this->namespace.NS.$this->controllersDir.NS.$controllerName);
         $controllerClassName = $controllerName . 'Controller';
         $controllerObject = new $controllerClassName();
         $controllerObject->execute($context);
@@ -43,6 +40,7 @@ class CWebApplication extends CApplication
 	protected function configs()
 	{
 	    return parent::configs() + array(
+			'controllersDir',
 	        'siteUrl' => '_siteUrl',
 	    );
 	}

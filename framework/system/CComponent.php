@@ -2,6 +2,7 @@
 
 /**
  * CComponent
+ * Base class of all components that have events and configuration support. 
  *
  * @author cadina
  */

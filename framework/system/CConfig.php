@@ -49,9 +49,8 @@ final class CConfig extends CBase implements IteratorAggregate, ArrayAccess
         unset($this->_config[$offset]);
     }
     
-    public static function load($name)
+    public static function load($file)
     {
-        $file = APPLICATION_NAMESPACE_CONFIGS . NS . $name;
         $config = function () use ($file) { return load($file); };
         return new CConfig($config());
     }

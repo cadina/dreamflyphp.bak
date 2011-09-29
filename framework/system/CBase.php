@@ -9,11 +9,19 @@
  */
 abstract class CBase
 {
-
+    /**
+     * CBase::initialize()
+     * This is the method which will be called before the object come to use.
+     * You can easily override it to provide your initialization for the object.
+     * IMPORTANT: Remember to call parent::initialize() if you override the system components.
+     */
     protected function initialize()
     {
     }
-    
+
+    /**
+     * EXPERIMENTAL!!
+     */
     protected function call($overload, $arguments)
     {
         $argscount = count($arguments);
@@ -111,7 +119,10 @@ abstract class CBase
     static private $overloadsRaw;
     
     static private $overloads = array();
-    
+
+    /**
+     * EXPERIMENTAL!!
+     */
     static protected function overloads()
     {
         return array();

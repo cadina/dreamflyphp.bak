@@ -9,12 +9,22 @@
 abstract class CApplication extends CComponent implements IApplication
 {
 
+	protected $configsDir = 'configs';
+
+	protected $namespace;
+
 	private $_modules = array();
 	
 	private $_moduleInstances  = array();
-	
-	public function __construct()
+
+
+	final public function __construct($namespace, $config = null)
 	{
+		$this->namespace = $namespace;
+		if ($config != null)
+		{
+			$this->configure(new CConfig($config));
+		}
 	}
 	
 	public function __get($name)
@@ -22,6 +32,12 @@ abstract class CApplication extends CComponent implements IApplication
 	    return $this->getModule($name);
 	}
 	
+	public function loadConfig($name)
+	{
+		$file = $this->namespace.NS.$this->configsDir.NS.$name;
+		return CConfig::load($file);
+	}
+
     public function getModule($name)
     {
         if (isset($this->_moduleInstances[$name])) return $this->_moduleInstances[$name];
@@ -45,6 +61,7 @@ abstract class CApplication extends CComponent implements IApplication
     protected function configs()
     {
         return parent::configs() + array(
+			'configsDir',
             'modules'   => array($this, 'configModules'),
         );
     }
