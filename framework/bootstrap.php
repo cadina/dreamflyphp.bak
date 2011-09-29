@@ -67,12 +67,12 @@ if (!function_exists('syserr'))
 
 class _
 {
-	private static $namespaces = array();
+    private static $namespaces = array();
 
-	private static $autoload_namespaces = array();
+    private static $autoload_namespaces = array();
 
-	private static function find($name, &$filename = null, &$pathname = null)
-	{
+    private static function find($name, &$filename = null, &$pathname = null)
+    {
         if (preg_match('/^(((' . implode('|', array_keys(self::$namespaces)) . ')\.)((\w+\.)*))(\w+|\*)$/', $name, $matches))
         {
             $path = self::$namespaces[$matches[3]] . DIRECTORY_SEPARATOR . str_replace(NAMESPACE_SEPARATOR, DIRECTORY_SEPARATOR, $matches[4]);
@@ -83,20 +83,20 @@ class _
             //echo $file.'<br/>';
             return file_exists($file) ? $file : false;
         }
-	}
+    }
 
-	public static function map($namespace, $path)
-	{
-		if ($path != null)
-		{
-			self::$namespaces[$namespace] = $path;
-		}
-		else
-		{
-			unset(self::$namespaces[$namspace]);
-		}
-	}
-	
+    public static function map($namespace, $path)
+    {
+        if ($path != null)
+        {
+            self::$namespaces[$namespace] = $path;
+        }
+        else
+        {
+            unset(self::$namespaces[$namspace]);
+        }
+    }
+    
     public static function load($name, $once = FALSE)
     {
         if ($file = self::find($name, $filename, $pathname))
@@ -114,7 +114,7 @@ class _
         {
             if ($filename == '*')
             {
-				self::$autoload_namespaces[] = $pathname;
+                self::$autoload_namespaces[] = $pathname;
             }
             else
             {
@@ -137,9 +137,9 @@ class _
             if (!class_exists($name)) syserr();
         }
         else
-		{
-			syserr();
-		}
+        {
+            syserr();
+        }
 
         if (empty($arguments))
         {
@@ -153,39 +153,39 @@ class _
         return $instance;
     }
 
-	public static function autoload($name)
-	{
-		if ($file = self::find($name))
-		{
-			require_once $name;
-			return;
-		}
-		foreach (self::$autoload_namespaces as $namespace)
-		{
-			if ($file = find($namespace . NAMESPACE_SEPARATOR . $name))
-			{
-				require_once $file;
-				return;
-			}
-		}
-		syserr();
-	}
+    public static function autoload($name)
+    {
+        if ($file = self::find($name))
+        {
+            require_once $name;
+            return;
+        }
+        foreach (self::$autoload_namespaces as $namespace)
+        {
+            if ($file = find($namespace . NAMESPACE_SEPARATOR . $name))
+            {
+                require_once $file;
+                return;
+            }
+        }
+        syserr();
+    }
 }
 
 
 if (!function_exists('map'))
 {
-	function map($namespace, $path)
-	{
-		_::map($namespace. $path);
-	}
+    function map($namespace, $path)
+    {
+        _::map($namespace. $path);
+    }
 }
 
 if (!function_exists('load'))
 {
     function load($name, $once = FALSE)
     {
-		_::load($name, $once);
+        _::load($name, $once);
     }
 }
 
@@ -193,7 +193,7 @@ if (!function_exists('need'))
 {
     function need($name)
     {
-		_::load($name, TRUE);
+        _::load($name, TRUE);
     }
 }
 
@@ -212,13 +212,13 @@ if (!function_exists('create'))
 {
     function create($name, $arguments = array())
     {
-		_::create($name, $arguments);
+        _::create($name, $arguments);
     }
 }
 
 function __autoload($name)
 {
-	_::autoload($name);
+    _::autoload($name);
 }
 
 
