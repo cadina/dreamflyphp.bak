@@ -1,5 +1,5 @@
 <?php
 
-abstract class CExecutionContext extends CBase
+abstract class CExecutionContext
 {
 }

@@ -1,8 +1,12 @@
 <?php
 
-return array(
-    'routes' => array(
-        'spec' => array('/post-<id:\d+>', 'home', 'post', array('<id>')),
-	    'default' => array('/<controller:\w+>/<action:\w+>', '<controller>', '<action>'),
-	),
-);
+return
+[
+    'routes' =>
+    [
+        new CRegExpRoute('/', 'index'),
+        new CRegExpRoute('/post-<id:\d+>', 'test', ['<id>']),
+        new CRegExpRoute('/<action:\w+>', '<action>'),
+	    new CRegExpRoute('/<controller:\w+>/<action:\w+>', '<controller>.<action>'),
+	],
+];

@@ -1,7 +1,5 @@
 <?php
 
-return array(
-	'siteUrl' => '',
-	'modules' => array(
-	),
-);
+return [
+	'siteUrl' => 'http://dreamflyphp.com/',
+];

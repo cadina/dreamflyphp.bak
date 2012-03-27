@@ -2,57 +2,49 @@
 
 class CWebApplication extends CApplication
 {
+    protected $siteUrl;
 
-    protected $_siteUrl;
+    protected $request;
+    protected $router;
 
 
-    final public function __construct()
+    protected function initialize()
     {
-        parent::__construct();
-        $this->_initializeModules();
+        parent::initialize();
+
+        $this->request = new CWebRequest($this);
+        $this->router = new CRouter($this);
     }
+
+	protected function configs()
+	{
+	    return parent::configs() + [
+            'siteUrl',
+	    ];
+	}
+
 
 	final public function run()
 	{
-        $this->configure(CConfig::load('application'));
-		$this->initialize();
-		$context = $this->poccessRequest();
-		$this->executeController($context);
-	}
-	
-	protected function poccessRequest()
-	{
-        $request = $this->getModule('request');
-        $this->router->resolve($request, $controller, $action, $params);
+        $request = $this->request;
+        $router = $this->router;
+
+        $this->router->resolve($request, $actionName, $params);
         $context = new CWebExecutionContext();
-        $context->controllerName = $controller;
-        $context->actionName = $action;
+        $context->actionName = $actionName;
         $context->params = $params;
-        return $context;
-	}
-	
-	protected function executeController($context)
-	{
-        $controllerName = $context->controllerName;
-        need(APPLICATION_NAMESPACE_CONTROLLERS.NS.$controllerName);
-        $controllerClassName = $controllerName . 'Controller';
-        $controllerObject = new $controllerClassName();
-        $controllerObject->execute($context);
-	}
-	
-	protected function configs()
-	{
-	    return parent::configs() + array(
-	        'siteUrl' => '_siteUrl',
-	    );
-	}
-	
-	private function _initializeModules()
-	{
-	    $this->setModule('request',  'system.web.CWebRequest');
-	    $this->setModule('response', 'system.web.CWebResponse');
-	    $this->setModule('cookies', 'system.web.CCookiesManager');
-        $this->setModule('router', 'system.web.CRouter');
+        $this->loadAction($actionName);
+        $actionClassName = $actionName.'Action';
+        $action = new $actionClassName();
+        $action->execute($context);
 	}
 
+    public function loadAction($name)
+    {
+        CLoader::load($this->getNamespace().NS.'actions'.NS.$name);
+        $actionClassName = $name.'Action';
+        $action = new $actionClassName;
+        return $action;
+    }
+	
 }

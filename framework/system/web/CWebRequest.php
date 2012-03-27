@@ -1,21 +1,16 @@
 <?php
 
-class CWebRequest extends CModule
+class CWebRequest extends CComponent
 {
 
     public $protocol;
-
     public $https;
-
     public $method;
-
     public $host;
-
     public $path;
-
     public $url;
 	
-	protected function initialize()
+	public function initialze()
 	{
 	    $this->protocol = $_SERVER['SERVER_PROTOCOL'];
 	    $this->https = empty($_SERVER['HTTPS']);

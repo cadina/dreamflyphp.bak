@@ -5,11 +5,11 @@
  * 
  * @author cadina
  */
-final class CConfig extends CBase implements IteratorAggregate, ArrayAccess
+final class CConfig implements IteratorAggregate, ArrayAccess
 {
-    private $_config;
+    private $_config = [];
 
-    public function __construct(&$config)
+    public function __construct(&$config = [])
     {
         $this->_config =& $config;
     }
@@ -49,10 +49,4 @@ final class CConfig extends CBase implements IteratorAggregate, ArrayAccess
         unset($this->_config[$offset]);
     }
     
-    public static function load($name)
-    {
-        $file = APPLICATION_NAMESPACE_CONFIGS . NS . $name;
-        $config = function () use ($file) { return load($file); };
-        return new CConfig($config());
-    }
 }

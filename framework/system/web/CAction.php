@@ -1,14 +1,9 @@
 <?php
 
-abstract class CAction extends CBase implements IExecutable
+abstract class CAction implements IExecutable
 {
-    protected $controller;
-
-    protected $name;
-
-    public function __construct($controller, $name)
+    public function execute($context)
     {
-        $this->controller = $controller;
-        $this->name = $name;
+        call_user_func_array([$this, 'run'], $context->params);
     }
 }

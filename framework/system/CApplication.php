@@ -6,53 +6,48 @@
  * 
  * @author cadina
  */
-abstract class CApplication extends CComponent implements IApplication
+abstract class CApplication
 {
+    use TConfigurable;
 
-	private $_modules = array();
-	
-	private $_moduleInstances  = array();
-	
-	public function __construct()
-	{
-	}
-	
-	public function __get($name)
-	{
-	    return $this->getModule($name);
-	}
-	
-    public function getModule($name)
+    private $_directory;
+    private $_namespace;
+
+
+    protected function initialize()
     {
-        if (isset($this->_moduleInstances[$name])) return $this->_moduleInstances[$name];
-        else if (isset($this->_modules[$name]))
-        {
-            $path = $this->_modules[$name];
-            if ($file = map($path, $className)) require_once $file;
-            $module = $this->_moduleInstances[$name] = call_user_func($className . '::getInstance');
-            return $module;
-        }
-        else syserr();
-    }
-    
-    public function setModule($name, $module)
-    {
-        if (is_string($module)) $this->_modules[$name] = $module;
-        else if ($module instanceof CModule) $this->_moduleInstances[$name] = $module;
-        else syserr();
+        $this->configure($this->loadConfig('application'));
     }
 
+    protected function getDirectory()
+    {
+        return $this->_directory;
+    }
+
+    protected function getNamespace()
+    {
+        return $this->_namespace;
+    }
+	
     protected function configs()
     {
-        return parent::configs() + array(
-            'modules'   => array($this, 'configModules'),
-        );
-    }
-    
-    protected function configModules($modules)
-    {
-        foreach ($modules as $name => $module)
-            $this->_modules[$name] = $module;
+        return [
+        ];
     }
 
+
+    public function __construct($namespace, $directory)
+    {
+        CLoader::registerNamespace($namespace, $directory);
+        $this->_directory = $directory;
+        $this->_namespace = $namespace;
+        $this->initialize();
+    }
+
+    public function loadConfig($name)
+    {
+        $configArray = CLoader::load($this->getNamespace().NS.'configs'.NS.$name);
+        return new CConfig($configArray);
+    }
+    
 }

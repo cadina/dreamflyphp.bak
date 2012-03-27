@@ -1,19 +1,8 @@
 <?php
 
-/**
- * CBase
- * Base class of all classes in the framework.
- * Provides function overloading. (call method and overloads method)
- * 
- * @author cadina
- */
-abstract class CBase
+trait TOverloadable
 {
 
-    protected function initialize()
-    {
-    }
-    
     protected function call($overload, $arguments)
     {
         $argscount = count($arguments);
