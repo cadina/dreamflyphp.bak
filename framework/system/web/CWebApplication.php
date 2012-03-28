@@ -31,19 +31,18 @@ class CWebApplication extends CApplication
 
         $this->router->resolve($request, $actionName, $params);
         $context = new CWebExecutionContext();
-        $context->actionName = $actionName;
+        $context->request = $request;
+        $context->action = $actionName;
         $context->params = $params;
-        $this->loadAction($actionName);
-        $actionClassName = $actionName.'Action';
-        $action = new $actionClassName();
+        $action = $this->loadAction($actionName);
         $action->execute($context);
 	}
 
     public function loadAction($name)
     {
         CLoader::load($this->getNamespace().NS.'actions'.NS.$name);
-        $actionClassName = $name.'Action';
-        $action = new $actionClassName;
+        $actionClassName = substr(strrchr($name, NS) ?: NS.$name, 1).'Action';
+        $action = new $actionClassName($this);
         return $action;
     }
 	

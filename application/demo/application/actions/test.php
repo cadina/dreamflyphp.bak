@@ -2,7 +2,7 @@
 
 class TestAction extends CAction
 {
-    public function run($id)
+    public function get($id)
     {
         echo $id;
     }

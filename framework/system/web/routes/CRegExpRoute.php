@@ -17,14 +17,11 @@ class CRegExpRoute implements IRoute
     
     public function match($request, &$action, &$params)
     {
-        $url = $request->url;
+        $path = $request->path_info;
         $pattern = $this->pattern;
-        if (preg_match('/^\/\//', $pattern)) {
-            $pattern = '<_protocol:[a-zA-Z]+>:' . $pattern;
-        }
-        else if (preg_match('/^\//', $pattern)) {
-            $pattern = '<_protocol:[a-zA-Z]+>://<_host:[a-zA-Z.-]+>' . $pattern;
-        }
+        $pattern = preg_replace_callback('/^([^<>]+)$/', function($matches) {
+            return preg_quote($matches[1], '/');
+        }, $pattern);
         $pattern = preg_replace_callback('/^([^<>]+)</', function($matches) {
             return preg_quote($matches[1], '/').'<';
         }, $pattern);
@@ -38,15 +35,21 @@ class CRegExpRoute implements IRoute
             ['/<([^<>:]+)>/', '/<(\w+):([^<>]+)>/'],
             ['(\1)', '(?P<\1>\2)'],
             $pattern);
-        if (preg_match('/^' . $pattern . '$/', $url, $matches)) {
+        if (preg_match('/^' . $pattern . '$/', $path, $matches)) {
             $patterns = array('/\\\</', '/\\\>/');
             $replacements = array('<', '>');
+            foreach ($request->get as $name => $value) {
+                $patterns[$name] = '/<' . $name . '>/';
+                $replacements[$name] = $value;
+            }
             foreach ($matches as $name => $value) {
                 if (is_string($name)) {
-                    $patterns[] = '/<' . $name . '>/';
-                    $replacements[] = $value;
+                    $patterns[$name] = '/<' . $name . '>/';
+                    $replacements[$name] = $value;
                 }
             }
+            $patterns[] = '/<.*>/';
+            $replacements[] = '';
             $action = $this->action;
             $action = preg_replace($patterns, $replacements, $action);
             $params = array();

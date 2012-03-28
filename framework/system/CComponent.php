@@ -4,7 +4,7 @@ class CComponent
 {
     protected $app;
 
-    protected function initialze()
+    protected function initialize()
     {
     }
 
@@ -12,7 +12,7 @@ class CComponent
     public function __construct($app)
     {
         $this->app = $app;
-        $this->initialze();
+        $this->initialize();
     }
 
 }

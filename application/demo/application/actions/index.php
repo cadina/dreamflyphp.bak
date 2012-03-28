@@ -2,7 +2,7 @@
 
 class IndexAction extends CAction
 {
-    public function run()
+    public function get()
     {
         echo 'Hello, world!';
     }

@@ -17,6 +17,11 @@ if (!defined('SCRIPT_EXT'))
 
 spl_autoload_register();
 
+set_exception_handler(function($exception) {
+    echo '<pre>';
+    throw $exception;
+});
+
 
 require('system/CLoader.php');
 

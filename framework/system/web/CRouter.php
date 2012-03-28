@@ -19,7 +19,7 @@ class CRouter extends CComponent
     }
 
     
-    public function initialze()
+    public function initialize()
     {
         $this->configure($this->app->loadConfig('route'));
     }

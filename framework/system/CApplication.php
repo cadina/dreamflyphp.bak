@@ -32,6 +32,9 @@ abstract class CApplication
     protected function configs()
     {
         return [
+            'preloads' => function($preloads) {
+                CLoader::loadAll($preloads);
+            },
         ];
     }
 
