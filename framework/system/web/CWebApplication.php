@@ -2,7 +2,7 @@
 
 class CWebApplication extends CApplication
 {
-    protected $siteUrl;
+    protected $defaultAction = 'index';
 
     protected $request;
     protected $router;
@@ -18,28 +18,43 @@ class CWebApplication extends CApplication
 
 	protected function configs()
 	{
-	    return parent::configs() + [
-            'siteUrl',
-	    ];
+	    return [
+            'defaultAction',
+	    ] + parent::configs();
 	}
 
 
-	final public function run()
+    public function run()
+    {
+        return $this->execute();
+    }
+    
+	public function execute($context = null)
 	{
         $request = $this->request;
         $router = $this->router;
 
-        $this->router->resolve($request, $actionName, $params);
-        $context = new CWebExecutionContext();
-        $context->request = $request;
-        $context->action = $actionName;
-        $context->params = $params;
+        if (!$this->router->resolve($request, $actionName, $params)) {
+            throw new CException();
+        }
+        if (!isset($context)) {
+            $context = new CWebExecutionContext();
+            $context->request = $request;
+            $context->params = $params;
+        }
         $action = $this->loadAction($actionName);
         $action->execute($context);
 	}
 
     public function loadAction($name)
     {
+        $parts = explode(NS, $name);
+        $actionName = array_pop($parts);
+        if (empty($actionName)) {
+            $actionName = $this->defaultAction;
+        }
+        array_push($parts, $actionName);
+        $name = implode(NS, $parts);
         CLoader::load($this->getNamespace().NS.'actions'.NS.$name);
         $actionClassName = substr(strrchr($name, NS) ?: NS.$name, 1).'Action';
         $action = new $actionClassName($this);

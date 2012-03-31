@@ -1,5 +1,7 @@
 <?php
 
 return [
-	'siteUrl' => 'http://dreamflyphp.com/',
+    'autoloads' => [
+        'application.library.*',
+    ],
 ];

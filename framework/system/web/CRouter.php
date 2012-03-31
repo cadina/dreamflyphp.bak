@@ -31,7 +31,7 @@ class CRouter extends CComponent
                 return $name;
             }
         }
-        throw new CException();
+        return false;
     }
     
     public function generate($name, $params)

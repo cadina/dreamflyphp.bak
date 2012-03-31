@@ -6,12 +6,13 @@
  * 
  * @author cadina
  */
-abstract class CApplication
+abstract class CApplication implements IExecutable
 {
     use TConfigurable;
 
     private $_directory;
     private $_namespace;
+    private $_modules = [];
 
 
     protected function initialize()
@@ -32,10 +33,24 @@ abstract class CApplication
     protected function configs()
     {
         return [
-            'preloads' => function($preloads) {
+            'autoloads' => function($preloads) {
                 CLoader::loadAll($preloads);
             },
+            'modules' => function($modules) {
+                $modules = array_merge($this->modules(), $modules);
+                foreach ($modules as $name => $module) {
+                    if (is_int($name)) {
+                        $name = $module;
+                    }
+                    $this->_modules[$name] = $module;
+                }
+            },
         ];
+    }
+
+    protected function modules()
+    {
+        return [];
     }
 
 
@@ -47,10 +62,26 @@ abstract class CApplication
         $this->initialize();
     }
 
-    public function loadConfig($name)
+    public function loadConfig($name, $defaults = [])
     {
-        $configArray = CLoader::load($this->getNamespace().NS.'configs'.NS.$name);
+        $configName = $this->getNamespace() . NS . 'configs' . NS . $name;
+        $configArray = CLoader::load($configName) ?: $defaults;
         return new CConfig($configArray);
+    }
+
+    public function getModule($name)
+    {
+        if (!isset($this->_modules[$name])) {
+            throw new CException();
+        }
+        $module =& $this->_modules[$name];
+        if (is_string($module)) {
+            $moduleClassname = $module;
+            $module = CLoader::create($moduleClassname);
+        }
+        else {
+            throw new CException();
+        }
     }
     
 }

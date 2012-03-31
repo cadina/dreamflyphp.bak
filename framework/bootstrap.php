@@ -25,6 +25,16 @@ set_exception_handler(function($exception) {
 
 require('system/CLoader.php');
 
+function load($name)
+{
+    if (is_array($name)) {
+        return CLoader::loadAll($name);
+    }
+    return CLoader::load($name);
+}
+
+CLoader::enableAutoload();
+
 CLoader::registerNamespace('system', __DIR__ . DS . 'system');
 
 CLoader::loadAll([

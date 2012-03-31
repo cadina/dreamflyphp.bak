@@ -36,6 +36,7 @@ class CRegExpRoute implements IRoute
             ['(\1)', '(?P<\1>\2)'],
             $pattern);
         if (preg_match('/^' . $pattern . '$/', $path, $matches)) {
+            //escaping '<' and '>'
             $patterns = array('/\\\</', '/\\\>/');
             $replacements = array('<', '>');
             foreach ($request->get as $name => $value) {
@@ -44,17 +45,23 @@ class CRegExpRoute implements IRoute
             }
             foreach ($matches as $name => $value) {
                 if (is_string($name)) {
-                    $patterns[$name] = '/<' . $name . '>/';
-                    $replacements[$name] = $value;
+                    if (!empty($value)) {
+                        $patterns[$name] = '/<' . $name . '>/';
+                        $replacements[$name] = $value;
+                    }
                 }
             }
+            $patterns[] = '/<.*:(.*)>/';
+            $replacements[] = '(\1)';
             $patterns[] = '/<.*>/';
             $replacements[] = '';
             $action = $this->action;
             $action = preg_replace($patterns, $replacements, $action);
-            $params = array();
-            foreach ($this->params as $name => $param) {
-                $params[$name] = preg_replace($patterns, $replacements, $param);
+            $params = [];
+            foreach ($this->params as $key => $param) {
+                if (is_string($param) || is_int($param)) {
+                    $params[$key] = preg_replace($patterns, $replacements, $param);
+                }
             }
             return true;
         }
