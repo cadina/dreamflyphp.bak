@@ -18,7 +18,7 @@ class CWebRequest extends CComponent
 	    $this->https = empty($_SERVER['HTTPS']);
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		$this->host = $_SERVER['HTTP_HOST'];
-		$this->path_info = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';
+		$this->path = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '/';
         $this->request_uri = $_SERVER['REQUEST_URI'];
         $this->get = new CArray($_GET);
         $this->post = new CArray($_POST);

@@ -42,7 +42,7 @@ class CArray implements IteratorAggregate, ArrayAccess
         if (is_array($offset)) {
             $result = [];
             foreach ($offset as $key => $suboffset) {
-                $result[$key] = $this->array[$suboffset];
+                $result[$suboffset] = $this->array[$suboffset];
             }
             return $result;
         }
@@ -67,5 +67,10 @@ class CArray implements IteratorAggregate, ArrayAccess
             }
         }
         unset($this->array[$offset]);
+    }
+
+    public function getArray()
+    {
+        return $this->array;
     }
 }

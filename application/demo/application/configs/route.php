@@ -5,7 +5,7 @@ return
     'routes' =>
     [
         new CRegExpRoute('/post-<id:\d+>', 'test', ['<id>']),
-        new CRegExpRoute('/<action:\w+>?', '<action:index>'),
-        new CRegExpRoute('/<controller:\w+>(/<action:\w+>)?', '<controller>.<action:index>'),
+        new CRegExpRoute('/a-<id:[^ab]+>-b', 'test', ['<id>']),
+        new CDefaultRoute(),
     ],
 ];

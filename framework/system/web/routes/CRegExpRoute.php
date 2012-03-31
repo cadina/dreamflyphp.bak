@@ -17,52 +17,32 @@ class CRegExpRoute implements IRoute
     
     public function match($request, &$action, &$params)
     {
-        $path = $request->path_info;
+        $path = $request->path;
         $pattern = $this->pattern;
-        $pattern = preg_replace_callback('/^([^<>]+)$/', function($matches) {
-            return preg_quote($matches[1], '/');
-        }, $pattern);
-        $pattern = preg_replace_callback('/^([^<>]+)</', function($matches) {
-            return preg_quote($matches[1], '/').'<';
-        }, $pattern);
-        $pattern = preg_replace_callback('/>([^<>]+)</', function($matches) {
-            return '>'.preg_quote($matches[1], '/').'<';
-        }, $pattern);
-        $pattern = preg_replace_callback('/>([^<>]+)$/', function($matches) {
-            return '>'.preg_quote($matches[1], '/');
-        }, $pattern);
+        $pattern = preg_replace_callback(
+            ['/^([^<>]+)$/', '/^([^<>]+)(?=\<)/', '/(?<=\>)([^<>]+)$/', '/(?<=\>)([^<>]+)(?=\<)/'],
+            function($m) {return preg_quote($m[1], '/');},
+            $pattern);
         $pattern = preg_replace(
             ['/<([^<>:]+)>/', '/<(\w+):([^<>]+)>/'],
             ['(\1)', '(?P<\1>\2)'],
             $pattern);
         if (preg_match('/^' . $pattern . '$/', $path, $matches)) {
-            //escaping '<' and '>'
-            $patterns = array('/\\\</', '/\\\>/');
-            $replacements = array('<', '>');
-            foreach ($request->get as $name => $value) {
-                $patterns[$name] = '/<' . $name . '>/';
-                $replacements[$name] = $value;
-            }
-            foreach ($matches as $name => $value) {
-                if (is_string($name)) {
-                    if (!empty($value)) {
-                        $patterns[$name] = '/<' . $name . '>/';
-                        $replacements[$name] = $value;
-                    }
+            $pathParams = (new CArray($matches))[array_filter(array_keys($matches), 'is_string')];
+            $getParams = $request->get->getArray();
+            $rawParams = array_merge($getParams, $pathParams);
+            $replaceFunc = function($subject) use($rawParams) {
+                if (is_string($subject)) {
+                    $subject = str_replace(['\\<', '\\<'], ['<', '>'], $subject);
+                    $subject = preg_replace_callback('/\<([^:]+)(:(.*))?\>/', function($matches) use($rawParams) {
+                        return empty($matches[1]) ? '' : ($rawParams[$matches[1]] ?: $matches[3]);
+                    }, $subject);
                 }
-            }
-            $patterns[] = '/<.*:(.*)>/';
-            $replacements[] = '(\1)';
-            $patterns[] = '/<.*>/';
-            $replacements[] = '';
+                return $subject;
+            };
             $action = $this->action;
-            $action = preg_replace($patterns, $replacements, $action);
-            $params = [];
-            foreach ($this->params as $key => $param) {
-                if (is_string($param) || is_int($param)) {
-                    $params[$key] = preg_replace($patterns, $replacements, $param);
-                }
-            }
+            $action = $replaceFunc($action);
+            $params = array_map($replaceFunc, $this->params);
             return true;
         }
         return false;
