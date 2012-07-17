@@ -94,7 +94,7 @@ trait TOverloadable
         
         //calling
         if ($match) return call_user_func_array(array($this, $match), $arguments);
-        else throw new Exception;
+        else throw new CException;
     }
     
     static private $overloadsRaw;

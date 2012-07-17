@@ -1,24 +1,9 @@
 <?php
 
-class CRegExpRoute implements IRoute
+trait TRegExpRoute
 {
-    protected $pattern;
-    protected $action;
-    protected $params;
-    protected $generator;
-    
-    public function __construct($pattern, $action, $params = [], $generator = null)
+    protected function regexpMatch($pattern, $match, &$action, &$params)
     {
-        $this->pattern = $pattern;
-        $this->action = $action;
-        $this->params = $params;
-        $this->generator = $generator;
-    }
-    
-    public function match($request, &$action, &$params)
-    {
-        $path = $request->path;
-        $pattern = $this->pattern;
         $pattern = preg_replace_callback(
             ['/^([^<>]+)$/', '/^([^<>]+)(?=\<)/', '/(?<=\>)([^<>]+)$/', '/(?<=\>)([^<>]+)(?=\<)/'],
             function($m) {return preg_quote($m[1], '/');},
@@ -27,10 +12,10 @@ class CRegExpRoute implements IRoute
             ['/<([^<>:]+)>/', '/<(\w+):([^<>]+)>/'],
             ['(\1)', '(?P<\1>\2)'],
             $pattern);
-        if (preg_match('/^' . $pattern . '$/', $path, $matches)) {
+        if (preg_match('/^' . $pattern . '$/', $match, $matches)) {
+            $initParams = (new CArray($params))[array_filter(array_keys($params), 'is_string')];
             $pathParams = (new CArray($matches))[array_filter(array_keys($matches), 'is_string')];
-            $getParams = $request->get->getArray();
-            $rawParams = array_merge($getParams, $pathParams);
+            $rawParams = array_merge($initParams, $pathParams);
             $replaceFunc = function($subject) use($rawParams) {
                 if (is_string($subject)) {
                     $subject = str_replace(['\\<', '\\<'], ['<', '>'], $subject);
@@ -40,22 +25,14 @@ class CRegExpRoute implements IRoute
                 }
                 return $subject;
             };
-            $action = $this->action;
             $action = $replaceFunc($action);
-            $params = array_map($replaceFunc, $this->params);
+            $params = array_map($replaceFunc, (new CArray($params))[array_filter(array_keys($params), 'is_int')]);
             return true;
         }
         return false;
     }
 
-    public function generate($params)
+    protected function regexpGenerate($params)
     {
-        if (isset($this->generator)) {
-            call_user_func($this->generator, $params);
-        }
-        else {
-            return '';
-        }
     }
 }
-

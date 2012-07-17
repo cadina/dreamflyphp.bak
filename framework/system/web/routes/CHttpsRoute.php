@@ -1,21 +1,18 @@
 <?php
 
-class CHttpsRoute implements IRoute
+class CHttpsRoute extends CWrapRoute
 {
-    protected $route;
-
-    public function __construct($route)
+    public function __construct($routes)
     {
-        $this->route = $route;
+        parant::__construct($routes);
     }
 
-    public function match($request, &$action, &$params)
+    public function matchWrap($request, &$action, &$params)
     {
-        return $request->https and $this->route->match($request, $action, $params);
+        return $request->https;
     }
 
     public function generate($params)
     {
-        return $this->route->generate($params);
     }
 }

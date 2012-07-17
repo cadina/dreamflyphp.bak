@@ -2,4 +2,5 @@
 
 abstract class CExecutionContext
 {
+    public $application;
 }

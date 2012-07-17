@@ -4,8 +4,8 @@ return
 [
     'routes' =>
     [
-        new CRegExpRoute('/post-<id:\d+>', 'test', ['<id>']),
-        new CRegExpRoute('/a-<id:[^ab]+>-b', 'test', ['<id>']),
+        new CPathRoute('/post-<id:\d+>', 'test', '<id>'),
+        new CPathRoute('/a-<id:[^ab]+>-b', 'test', '<id>'),
         new CDefaultRoute(),
     ],
 ];

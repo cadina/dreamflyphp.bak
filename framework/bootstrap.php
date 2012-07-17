@@ -41,6 +41,7 @@ CLoader::loadAll([
     'system.*',
     'system.web.*',
     'system.web.routes.*',
+    'system.web.results.*',
 ]);
 
 

@@ -39,11 +39,16 @@ class CWebApplication extends CApplication
         }
         if (!isset($context)) {
             $context = new CWebExecutionContext();
-            $context->request = $request;
-            $context->params = $params;
         }
+        $context->request = $request;
+        $context->params = $params;
+        $context->application = $this;
+        
         $action = $this->loadAction($actionName);
-        $action->execute($context);
+        $result = $action->execute($context);
+        if (!empty($result)) {
+            $result->execute($context);
+        }
 	}
 
     public function loadAction($name)
@@ -56,9 +61,15 @@ class CWebApplication extends CApplication
         array_push($parts, $actionName);
         $name = implode(NS, $parts);
         CLoader::load($this->getNamespace().NS.'actions'.NS.$name);
-        $actionClassName = substr(strrchr($name, NS) ?: NS.$name, 1).'Action';
+        $actionClassName = str_replace('-', '', substr(strrchr($name, NS) ?: NS.$name, 1)).'Action';
         $action = new $actionClassName($this);
         return $action;
     }
-	
+
+    public function loadView($name)
+    {
+        $view = new CView($this->getNamespace().NS.'views'.NS.$name);
+        return $view;
+    }
+
 }

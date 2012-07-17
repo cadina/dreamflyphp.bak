@@ -12,7 +12,23 @@ class CRouter extends CComponent
         return [
             'routes' => function($routes) {
                 foreach ($routes as $name => $route) {
-                    $this->routes[$name] = $route;
+                    if (is_object($route)) {
+                        $this->routes[$name] = $route;
+                    }
+                    else if (is_array($route)) {
+                        $class = array_shift($route);
+                        $route = CLoader::create($class, $route);
+                        $this->routes[$name] = $route;
+                    }
+                    else {
+                        throw new CException;
+                    }
+                }
+                //ensure all the routes implements IRoute
+                foreach ($routes as $route) {
+                    if (!($route instanceof IRoute)) {
+                        throw new CException;
+                    }
                 }
             },
         ];

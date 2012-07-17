@@ -6,7 +6,6 @@ Use spaces for indentation (4 spaces each indentation).
 Add 'C' prefix before your class names.
 Add 'I' prefix before your interface names.
 Add 'T' prefix befoer your trait names;
-Write interface in "system/interfaces.php".
 add global constants and functions into "bootstrap.php".
 
 Improvements for this file are welcomed.

@@ -54,7 +54,7 @@ class CLoader
     }
 
 
-    public static function load($name, $critical = true)
+    public static function load($name, $critical = true, $data = [])
     {
         if (!self::_check($name)) {
             throw new CException();
@@ -73,6 +73,9 @@ class CLoader
                 else {
                     return false;
                 }
+            }
+            if (!empty($data)) {
+                extract($data);
             }
             return require($file);
         }

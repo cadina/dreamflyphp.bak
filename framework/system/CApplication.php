@@ -40,7 +40,7 @@ abstract class CApplication implements IExecutable
                 $modules = array_merge($this->modules(), $modules);
                 foreach ($modules as $name => $module) {
                     if (is_int($name)) {
-                        $name = $module;
+                        $name = is_string($module) ? $module : $module['name'];
                     }
                     $this->_modules[$name] = $module;
                 }
@@ -65,7 +65,7 @@ abstract class CApplication implements IExecutable
     public function loadConfig($name, $defaults = [])
     {
         $configName = $this->getNamespace() . NS . 'configs' . NS . $name;
-        $configArray = CLoader::load($configName) ?: $defaults;
+        $configArray = CLoader::load($configName, false) ?: $defaults;
         return new CConfig($configArray);
     }
 
@@ -77,11 +77,19 @@ abstract class CApplication implements IExecutable
         $module =& $this->_modules[$name];
         if (is_string($module)) {
             $moduleClassname = $module;
-            $module = CLoader::create($moduleClassname);
+            $module = CLoader::create($moduleClassname, [$this]);
         }
-        else {
-            throw new CException();
+        else if (is_array($module)) {
+            $moduleClassname = $module['class'];
+            $moduleInstance = CLoader::create($moduleClassname, [$this] + ($module['args'] ?: []));
+            if (isset($module['vars'])) {
+                foreach ($module['vars'] as $key => $value) {
+                    $moduleInstance->$key = $value;
+                }
+            }
+            $module = $moduleInstance;
         }
+        return $module;
     }
     
 }

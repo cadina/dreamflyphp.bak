@@ -4,4 +4,6 @@ return [
     'autoloads' => [
         'application.library.*',
     ],
+    'modules' => [
+    ],
 ];
